@@ -26,11 +26,12 @@ const withModuleFederation = (config, options, mfConfig) => {
   config.experiments = { topLevelAwait: true };
   if (!options.isServer) {
     config.output.library = mfConfig.name;
-
-    config.externals = {
-      react: "React",
-      // ReactDOM: "ReactDOM"
-    };
+    if (options.dev) {
+      config.externals = {
+        react: "React",
+        // ReactDOM: "ReactDOM"
+      };
+    }
   } else {
     config.externals = {
       react: path.resolve(__dirname, "./react.js"),
