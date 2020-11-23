@@ -1,5 +1,6 @@
+const shell = require("shelljs");
 const path = require("path");
-const fs = require("fs");
+
 module.exports = class MergeRemoteChunksPlugin {
   constructor(options) {
     this._options = Object.assign(
@@ -18,8 +19,11 @@ module.exports = class MergeRemoteChunksPlugin {
     // Specify the event hook to attach to
     compiler.hooks.afterEmit.tap("MergeRemoteChunksPlugin", (output) => {
       const emittedAssets = Array.from(output.emittedAssets);
-      const { dir, name } = path.parse(options.filename);
-      const files = ["static/chunks/commons","static/chunks/webpack", path.join(dir, name)]
+      const files = [
+        "static/chunks/commons",
+        "static/chunks/webpack",
+        "static/runtime/remoteEntry",
+      ]
         .filter((neededChunk) =>
           emittedAssets.some((emmitedAsset) =>
             emmitedAsset.includes(neededChunk)
@@ -31,25 +35,15 @@ module.exports = class MergeRemoteChunksPlugin {
           )
         )
         .map((file) => path.join(compiler.options.output.path, file));
-
-      if (files.length > 1) {
-        const runtime = fs.readFileSync(files[0], "utf-8");
-        const remoteContainer = fs.readFileSync(files[1], "utf-8");
-        const merged = [runtime, remoteContainer].join("\n");
-        const remotePath = path.join(compiler.options.output.path, "static");
-        if (fs.existsSync(remotePath)) {
-          fs.mkdir(remotePath, { recursive: true }, (err) => {
-            if (err) throw err;
-          });
-        }
-        fs.writeFile(
-          path.join(
-            remotePath,
-            "/remoteEntryMerged.js"
-          ),
-          merged,
-          () => {}
-        );
+      if (files.length > 0) {
+        shell
+          .cat(files)
+          .to(
+            path.join(
+              compiler.options.output.path,
+              "static/runtime/remoteEntryMerged.js"
+            )
+          );
       }
     });
   }
