@@ -19,7 +19,7 @@ module.exports = class MergeRemoteChunksPlugin {
     compiler.hooks.afterEmit.tap("MergeRemoteChunksPlugin", (output) => {
       const emittedAssets = Array.from(output.emittedAssets);
       const { dir, name } = path.parse(options.filename);
-      const files = ["static/chunks/webpack", path.join(dir, name)]
+      const files = ["static/chunks/commons","static/chunks/webpack", path.join(dir, name)]
         .filter((neededChunk) =>
           emittedAssets.some((emmitedAsset) =>
             emmitedAsset.includes(neededChunk)
