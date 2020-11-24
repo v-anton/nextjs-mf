@@ -27,15 +27,12 @@ const withModuleFederation = (config, options, mfConfig) => {
   if (!options.isServer) {
     config.output.library = mfConfig.name;
 
-    config.externals = {
-      react: "React",
-      // ReactDOM: "ReactDOM"
-    };
+    config.externals = [...config.externals, { react: "React" }];
   } else {
-    config.externals = {
-      react: path.resolve(__dirname, "./react.js"),
-      // "react-dom": path.resolve("./react-dom.js"),
-    };
+    config.externals = [
+      ...config.externals,
+      { react: path.resolve(__dirname, "./react.js") },
+    ];
   }
   const federationConfig = {
     name: mfConfig.name,
