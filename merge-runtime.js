@@ -34,12 +34,12 @@ module.exports = class MergeRemoteChunksPlugin {
             emittedAsset.includes(neededChunk)
           )
         )
-        .map((file) => path.join(compiler.options.output.path, file));
+        .map((file) => path.resolve(compiler.options.output.path, file));
       if (files.length > 0) {
         shell
           .cat(files)
           .to(
-            path.join(
+            path.resolve(
               compiler.options.output.path,
               "static/runtime/remoteEntryMerged.js"
             )

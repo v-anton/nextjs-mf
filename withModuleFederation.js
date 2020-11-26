@@ -52,7 +52,8 @@ const withModuleFederation = (config, options, mfConfig) => {
   config.plugins.push(
     new options.webpack.container.ModuleFederationPlugin(federationConfig)
   );
-  if (mfConfig.mergeRuntime) {
+  // FIXME: resolve this workaround
+  if (!options.isServer && mfConfig.mergeRuntime) {
     config.plugins.push(new MergeRuntime(federationConfig));
   }
 };
