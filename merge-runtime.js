@@ -19,7 +19,11 @@ module.exports = class MergeRemoteChunksPlugin {
     // Specify the event hook to attach to
     compiler.hooks.afterEmit.tap("MergeRemoteChunksPlugin", (output) => {
       const emittedAssets = Array.from(output.emittedAssets);
-      const files = ["static/chunks/commons", "static/chunks/webpack"]
+      const files = [
+        "static/chunks/commons",
+        "static/chunks/webpack",
+        "static/runtime/remoteEntry",
+      ]
         .filter((neededChunk) =>
           emittedAssets.some((emmitedAsset) =>
             emmitedAsset.includes(neededChunk)
@@ -30,14 +34,8 @@ module.exports = class MergeRemoteChunksPlugin {
             emittedAsset.includes(neededChunk)
           )
         )
-        .map((file) => path.resolve(compiler.options.output.path, file))
-        .concat(
-          path.join(
-            compiler.options.output.path,
-            "static/runtime/remoteEntry.js"
-          )
-        );
-      if (files.length > 0) {
+        .map((file) => path.join(compiler.options.output.path, file));
+      if (files.length > 1) {
         shell
           .cat(files)
           .to(
