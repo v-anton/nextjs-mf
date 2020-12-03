@@ -1,4 +1,4 @@
-const shell = require("shelljs");
+const fs = require("fs");
 const path = require("path");
 
 module.exports = class MergeRemoteChunksPlugin {
@@ -38,14 +38,16 @@ module.exports = class MergeRemoteChunksPlugin {
           )
           .filter(Boolean)
           .map((file) => path.join(compiler.options.output.path, file));
-        shell
-          .cat(filesToMerge)
-          .to(
-            path.join(
-              compiler.options.output.path,
-              "static/runtime/remoteEntryMerged.js"
-            )
-          );
+        fs.writeFile(
+          path.join(
+            compiler.options.output.path,
+            "static/runtime/remoteEntryMerged.js"
+          ),
+          filesToMerge
+            .map((filePath) => fs.readFileSync(filePath, "utf-8"))
+            .join("\n"),
+          () => {}
+        );
       }
     });
   }
